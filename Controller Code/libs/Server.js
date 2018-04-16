@@ -4,6 +4,10 @@ var Server = function (opts) {
 
 }
 
+Server.prototype.testFunction = function(pin, time, increment, pulseWidth) {
+	socket.emit('testFunction', {pin, time, increment, pulseWidth});
+}
+
 Server.prototype.digitalRead = function(pin, cb) {
 	socket.emit('digitalRead', { pin });
 	socket.once('digitalRead.' + pin, cb);
