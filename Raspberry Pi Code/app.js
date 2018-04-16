@@ -1,21 +1,19 @@
 var app 	= require('http').createServer();
 var io 		= require('socket.io')(app);
-var Gpio 	= require('pigpio').Gpio, gpio,gpioNo;
+var Gpio 	= require('pigpio').Gpio;
 
 app.listen(955);
 console.log('App listening on port 955');
 
 var pinSetup = {};
 
-for (gpioNo = Gpio.MIN_GPIO; gpioNo <= Gpio.MAX_GPIO; gpioNo += 1) {
-  gpio = new Gpio(gpioNo);
-
-  console.log('GPIO ' + gpioNo + ':' +
-    ' mode=' + gpio.getMode() +
-    ' level=' + gpio.digitalRead()
-  );
-  pinSetup[gpioNo] = gpio;
-  pinSetup[gpioNo].pin = gpioNo;
+for (var i = Gpio.MIN_GPIO; i < Gpio.MAX_GPIO; i++) {
+    var gpio = new Gpio(i);
+	
+    console.log('GPIO %d - mode=%s level=%s', gpio.getMode(), gpio.digitalRead())
+	
+    pinSetup[i] = gpio;
+    pinSetup[i].pin = i;
 }
 
 io.on('connection', function (socket) {
