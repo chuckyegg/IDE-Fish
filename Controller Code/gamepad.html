@@ -29,9 +29,9 @@
 
 		  if (gamePad.buttons[7].value > .1) {
 		  	console.log("Move forward!")
-		  	socket.emit('speed', { speed: gamePad.buttons[7].value });
+		  	socket.emit('speed', { speed: gamePad.buttons[7].value , mulitplier: 100});
 		  } else {
-		  	socket.emit('speed', { speed: 0.1 })
+		  	socket.emit('speed', { speed: 1 })
 		  }
 
 		  if (gamePad.axes[0] > 0.1 || gamePad.axes[0] < -0.1) {
