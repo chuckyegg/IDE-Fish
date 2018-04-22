@@ -11,6 +11,65 @@
 <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Luckiest+Guy|Monoton|Montserrat" rel="stylesheet">
 </head>
 <body>
+
+<script src="http://192.168.1.66:955/socket.io/socket.io.js"></script>
+<script>
+    var socket = io("http://192.168.1.66:955");
+
+    socket.on('connected', function() {
+        console.log("Connected to PI");
+    });
+
+    function poll(gamePad) {
+        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+          if (!gamepads) {
+            return;
+          }
+
+          var gamePad = gamepads[0];
+
+          // 0 = left horizontal
+          // 1 = left vertical
+
+          // btn 6 = left trigger
+          // btn 7 = right trigger
+
+          if (gamePad.buttons[7].value > .1) {
+            console.log("Move forward!")
+            socket.emit('speed', { speed: gamePad.buttons[7].value , mulitplier: 250});
+            document.getElementById("speed-value").value = Math.round((gamePad.buttons[7].value * 250));
+          } else {
+            socket.emit('speed', { speed: 1 })
+            document.getElementById("speed-value").value = "1";
+          }
+
+          if (gamePad.axes[0] > 0.05 || gamePad.axes[0] < -0.05) {
+            console.log("Move horizontal")
+
+            socket.emit('rotate', { direction: 'horizontal', value: gamePad.axes[0] });
+            document.getElementById("x-rotation").value =  Math.round((gamePad.axes[0] * 45));
+          } else {
+            socket.emit('rotate', { direction: 'horizontal', value: 0 })
+            document.getElementById("x-rotation").value =  0;
+          }
+
+          if (gamePad.axes[1] > 0.05 || gamePad.axes[1] < -0.05) {
+            console.log("Move vertical")
+            socket.emit('rotate', { direction: 'vertical', value: gamePad.axes[1] });
+            document.getElementById("y-rotation").value =  -1*Math.round((gamePad.axes[1] * 45));
+          } else {
+            socket.emit('rotate', { direction: 'vertical', value: 0 })
+            document.getElementById("y-rotation").value =  0;
+          }
+
+
+
+
+    }
+
+    setInterval(poll, 50)
+
+</script>
   <h2>inFINity control<img src="Fishyy.png"></h2>
 
   <div class="grid-container">
