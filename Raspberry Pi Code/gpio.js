@@ -1,33 +1,45 @@
 var Gpio 	= require('pigpio').Gpio;
 
+function clamp(num, min, max) {
+  return num <= min ? min : num >= max ? max : num;
+}
 
 Gpio.prototype.rotate = function(percentage) {
 	var deviation = 1000 * percentage;
 	var newAngle = 1500 + deviation;
+
+	newAngle = Math.round(clamp(newAngle, 500, 2500))
+
+
 	this.servoWrite(newAngle);
 }
 
 Gpio.prototype.speed = function(percentage, multiplier) {
-	if(!this.sweeper){
-		this.target = 2500;
+	if(!this.sweeper) {
 		this.increment = 1;
+		this.direction = "+";
 
-		this.sweeper = setInterval( (pin) => {
-			if(pin.increment > 0 && pin.getServoPulseWidth() >= pin.target){
-				pin.increment = -pin.increment;
-				pin.target = 500;
-				return;
+		var self = this;
+
+		this.sweeper = setInterval(function(pin) {
+			if (pin.getServoPulseWidth() > 2200 || pin.getServoPulseWidth() < 800) { 
+				// FLIP
+				if (pin.direction === '+')
+					pin.direction = '-';
+				else
+					pin.direction = '+';
 			}
-			if(pin.increment <= 0 && pin.getServoPulseWidth() <= pin.target){
-				pin.increment = -pin.increment;
-				pin.target = 2500;
-				return;
-			}
-			pin.servoWrite(pin.getServoPulseWidth() + pin.increment)
-		}, 1, this);
+
+			var go = pin.direction === '+' ? pin.increment : -pin.increment; 
+
+			var clampo = clamp(Math.round(self.getServoPulseWidth() + go), 500, 2500)
+
+
+			self.servoWrite(clampo)
+		}, 30, this);
 	};
 
-	pin.increment = percentage * (multiplier || 1);	
+	this.increment = percentage * (multiplier || 1);	
 }
 
 Gpio.prototype.reset = function() {

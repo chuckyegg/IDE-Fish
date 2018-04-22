@@ -1,6 +1,8 @@
 var app 	= require('http').createServer();
 var io 		= require('socket.io')(app);
 var Gpio 	= require('./gpio.js');
+
+io.origins('*:*') 
 app.listen(955);
 console.log('App listening on port 955');
 
@@ -16,13 +18,15 @@ bottomServo.reset();
 leftServo.reset();
 backServo.reset();
 
+backServo.speed(1, 1);
+
 io.on('connection', function (socket) {
 	socket.emit('connected');
 	console.log('Client connected.');
 
 	socket.on('rotate', (data) => {
-		var direction = data.servo;
-		var percentage = data.angle;
+		var direction = data.direction;
+		var percentage = data.value;
 
 		if(direction === 'vertical'){
 			 leftServo.rotate(percentage);
@@ -36,9 +40,9 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('speed', (data) => {
-		var mulitplier = 1;
+		var mulitplier = 50;
 		var percentage = data.speed;
-		backServo.speed(percentage);
+		backServo.speed(percentage, mulitplier);
 	});
 
 });
