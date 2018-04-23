@@ -20,6 +20,10 @@
         console.log("Connected to PI");
     });
 
+    socket.on('LDR', function(data) {
+      console.log(data);
+    });
+
     function poll(gamePad) {
         var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
           if (!gamepads) {
@@ -36,14 +40,14 @@
 
           if (gamePad.buttons[7].value > .1) {
             console.log("Move forward!")
-            socket.emit('speed', { speed: gamePad.buttons[7].value , mulitplier: 250});
+            socket.emit('speed', { speed: gamePad.buttons[7].value , mulitplier: 50});
             document.getElementById("speed-value").value = Math.round((gamePad.buttons[7].value * 250));
           } else {
             socket.emit('speed', { speed: 1 })
             document.getElementById("speed-value").value = "1";
           }
 
-          if (gamePad.axes[0] > 0.05 || gamePad.axes[0] < -0.05) {
+          if (gamePad.axes[0] > 0.1 || gamePad.axes[0] < -0.1) {
             console.log("Move horizontal")
 
             socket.emit('rotate', { direction: 'horizontal', value: gamePad.axes[0] });
@@ -53,7 +57,7 @@
             document.getElementById("x-rotation").value =  0;
           }
 
-          if (gamePad.axes[1] > 0.05 || gamePad.axes[1] < -0.05) {
+          if (gamePad.axes[1] > 0.1 || gamePad.axes[1] < -0.1) {
             console.log("Move vertical")
             socket.emit('rotate', { direction: 'vertical', value: gamePad.axes[1] });
             document.getElementById("y-rotation").value =  -1*Math.round((gamePad.axes[1] * 45));

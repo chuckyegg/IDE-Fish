@@ -6,10 +6,10 @@ io.origins('*:*')
 app.listen(955);
 console.log('App listening on port 955');
 
-var rightServo 	= new Gpio(23, {mode: Gpio.OUTPUT});
-var topServo 	= new Gpio(17, {mode: Gpio.OUTPUT});
-var bottomServo = new Gpio(27, {mode: Gpio.OUTPUT});
-var leftServo	= new Gpio(22, {mode: Gpio.OUTPUT});
+var rightServo 	= new Gpio(27, {mode: Gpio.OUTPUT});
+var topServo 	= new Gpio(23, {mode: Gpio.OUTPUT});
+var bottomServo = new Gpio(22, {mode: Gpio.OUTPUT});
+var leftServo	= new Gpio(17, {mode: Gpio.OUTPUT});
 var backServo 	= new Gpio(15, {mode: Gpio.OUTPIT});
 
 rightServo.reset();
@@ -29,18 +29,18 @@ io.on('connection', function (socket) {
 		var percentage = data.value;
 
 		if(direction === 'vertical'){
-			 leftServo.rotate(percentage);
+			 leftServo.rotate(-percentage);
 			 rightServo.rotate(percentage);
 		}
 		if(direction === 'horizontal'){
-			topServo.rotate(percentage);
+			topServo.rotate(-percentage);
 			bottomServo.rotate(percentage);
 		}
 
 	});
 
 	socket.on('speed', (data) => {
-		var mulitplier = 50;
+		var mulitplier = 250;
 		var percentage = data.speed;
 		backServo.speed(percentage, mulitplier);
 	});
