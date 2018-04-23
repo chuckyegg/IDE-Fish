@@ -12,6 +12,8 @@ var bottomServo = new Gpio(22, {mode: Gpio.OUTPUT});
 var leftServo	= new Gpio(17, {mode: Gpio.OUTPUT});
 var backServo 	= new Gpio(15, {mode: Gpio.OUTPIT});
 
+var LDR			= new Gpio(21, {mode: Gpio.OUTPUT});
+
 rightServo.reset();
 topServo.reset();
 bottomServo.reset();
@@ -20,9 +22,26 @@ backServo.reset();
 
 backServo.speed(1, 1);
 
+
 io.on('connection', function (socket) {
 	socket.emit('connected');
 	console.log('Client connected.');
+
+	setInterval(() => {
+		setTimeout(() => {
+			LDR.mode(Gpio.OUTPUT);
+			LDR.digitalWrite(0);
+		},10);
+		LDR.mode(Gpio.INPUT);
+
+		time = Date.now();
+
+		while(LDR.digitalRead() != 1){
+		}
+		socket.emit('LDR', {time: (time - Date.now())});
+
+
+	}, 1000);
 
 	socket.on('rotate', (data) => {
 		var direction = data.direction;
@@ -40,7 +59,7 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('speed', (data) => {
-		var mulitplier = 250;
+		var mulitplier = data.mulitplier;
 		var percentage = data.speed;
 		backServo.speed(percentage, mulitplier);
 	});

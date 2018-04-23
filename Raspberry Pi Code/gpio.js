@@ -8,7 +8,7 @@ Gpio.prototype.rotate = function(percentage) {
 	var deviation = 300 * percentage;
 	var newAngle = 1500 + deviation;
 
-	newAngle = Math.round(clamp(newAngle, 1200, 1800))
+	newAngle = Math.round(clamp(newAngle, 500, 2500))
 
 
 	this.servoWrite(newAngle);
@@ -22,7 +22,10 @@ Gpio.prototype.speed = function(percentage, multiplier) {
 		var self = this;
 
 		this.sweeper = setInterval(function(pin) {
-			if (pin.getServoPulseWidth() > 1700 || pin.getServoPulseWidth() < 1300) { 
+
+			console.log("current: %s increment %s target %s", self.getServoPulseWidth(), self.increment)
+
+			if (pin.getServoPulseWidth() >= 1600 || pin.getServoPulseWidth() <= 1300) { 
 				// FLIP
 				if (pin.direction === '+')
 					pin.direction = '-';
@@ -32,11 +35,12 @@ Gpio.prototype.speed = function(percentage, multiplier) {
 
 			var go = pin.direction === '+' ? pin.increment : -pin.increment; 
 
-			var clampo = clamp(Math.round(self.getServoPulseWidth() + go), 1300, 1700)
+			var clampo = clamp(Math.round(self.getServoPulseWidth() + go), 1000, 2000)
 
 
+			console.log("new speed: %s", clampo)
 			self.servoWrite(clampo)
-		}, 30, this);
+		}, 40, this);
 	};
 
 	this.increment = percentage * (multiplier || 1);	
@@ -45,22 +49,5 @@ Gpio.prototype.speed = function(percentage, multiplier) {
 Gpio.prototype.reset = function() {
 	this.servoWrite(1500);
 }
-
-// Gpio.prototype.ldrCount = function(){
-// 	var count = 0;
-// 	var self = this;
-// 	setTimeout(function() {
-// 		this.mode(Gpio.OUTPUT);
-// 		this.digitalWrite(0);
-// 	},100, self);
-
-// 	while(this.digitalRead() === 0){
-
-// 	}
-
-
-	
-
-// }
 
 module.exports = Gpio; 
