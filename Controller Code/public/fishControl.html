@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script src="chart.js/dist/Chart.bundle.js"></script>
+  <script src="chart.js/samples/utils.js"></script>
+  <style>
+  canvas{
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+  </style>
+<script src="/chart.js/dist/Chart.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="fish.css">
-<link href="fish.js">
 <link href="https://fonts.googleapis.com/css?family=Raleway|Roboto" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Josefin+Slab" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Lato|Open+Sans+Condensed:300|Pacifico" rel="stylesheet">
@@ -12,7 +21,106 @@
 </head>
 <body>
 
-<script src="http://192.168.1.66:955/socket.io/socket.io.js"></script>
+  <h2>inFINity control<img src="Fishyy.png"></h2>
+
+  <div class="grid-container">
+    <div class="IMUControl">
+		  	Manual Control
+		  	<label class="switch">
+		  		<input type="checkbox">
+		  		<span class="slider round"></span>
+          </label>
+			  IMU Control
+    </div>
+
+    <div class="speed">
+        <br></br>
+        <label for="name">Speed Value</label><br></br>
+        <input type="number" name="speed-value" id="speed-value" value="0">
+        <br></br>
+    </div>
+
+    <div class="XRotVal"><br></br>
+        <label for="name">X Rotation</label><br></br>
+        <input type="number" name="x-rotation" id="x-rotation" value="0">
+        <br></br>
+    </div>
+
+    <div class="YRot"><br></br>
+      <label for="name">Y Rotation</label><br></br>
+      <input type="number" name="y-rotation" id="y-rotation" value="0"><br></br>
+    </div>
+    
+    <div class="lightSensorStream">
+			<h3>Light sensor stream</h3>
+      <div>
+        <canvas id="canvas"></canvas>
+      </div>
+      <br>
+      <br>
+      <script>
+        var config = {
+          type: 'line',
+          data: {
+            labels: [1,2,3,4,5,6,7],
+            datasets: [{
+              label: 'Light Intensity',
+              backgroundColor: window.chartColors.red,
+              borderColor: window.chartColors.red,
+              data: [
+                randomScalingFactor(),
+                randomScalingFactor(),
+                randomScalingFactor(),
+                randomScalingFactor(),
+                randomScalingFactor(),
+                randomScalingFactor(),
+                randomScalingFactor()
+              ],
+              fill: false,
+            }]
+          },
+          options: {
+            responsive: true,
+            title: {
+              display: true,
+            },
+            tooltips: {
+              mode: 'index',
+              intersect: false,
+            },
+            hover: {
+              mode: 'nearest',
+              intersect: true
+            },
+            scales: {
+              xAxes: [{
+                display: false,
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Time'
+                }
+              }],
+              yAxes: [{
+                display: true,
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Light Intensity'
+                }
+              }]
+            }
+          }
+        };
+
+        window.onload = function() {
+          var ctx = document.getElementById('canvas').getContext('2d');
+          window.myLine = new Chart(ctx, config);
+        };
+      </script>
+    </div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<!-- <script src="http://192.168.1.66:955/socket.io/socket.io.js"></script>
 <script>
     var socket = io("http://192.168.1.66:955");
 
@@ -72,41 +180,6 @@
     }
 
     setInterval(poll, 50)
-
-</script>
-  <h2>inFINity control<img src="Fishyy.png"></h2>
-
-  <div class="grid-container">
-    <div class="IMUControl">
-		  	Manual Control
-		  	<label class="switch">
-		  		<input type="checkbox">
-		  		<span class="slider round"></span>
-			</label>
-			IMU Control
-		</div>
-
-    <div class="speed">
-        <br></br>
-        <label for="name">Speed Value</label><br></br>
-        <input type="number" name="speed-value" id="speed-value" value="0"><br></br>
-    </div>
-
-    <div class="XRotVal"><br></br>
-        <label for="name">X Rotation</label><br></br>
-        <input type="number" name="x-rotation" id="x-rotation" value="0"><br></br>
-    </div>
-
-    <div class="YRot"><br></br>
-        <label for="name">Y Rotation</label><br></br>
-        <input type="number" name="y-rotation" id="y-rotation" value="0"><br></br></div>
-
-    <div class="lightSensorStream">
-			<h3>Light sensor stream</h3>
-    </div>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<script src="fish.js"></script>
+</script> -->
 </body>
 </html>
