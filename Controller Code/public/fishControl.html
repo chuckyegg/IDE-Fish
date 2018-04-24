@@ -24,14 +24,14 @@
   <h2>inFINity control<img src="Fishyy.png"></h2>
 
   <div class="grid-container">
-    <div class="IMUControl">
+    <!-- <div class="IMUControl">
 		  	Manual Control
 		  	<label class="switch">
 		  		<input type="checkbox">
 		  		<span class="slider round"></span>
           </label>
 			  IMU Control
-    </div>
+    </div> -->
 
     <div class="speed">
         <br></br>
@@ -50,24 +50,18 @@
       <label for="name">Y Rotation</label><br></br>
       <input type="number" name="y-rotation" id="y-rotation" value="0"><br></br>
     </div>
-
     <div class="lightSensorStream">
-			<h3>Light sensor stream</h3>
+      <h3>Light sensor stream</h3>
       <div>
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" height = 100></canvas>
       </div>
       <br>
       <br>
+      <!-- <script src="http://192.168.1.66:955/socket.io/socket.io.js"></script> -->
       <script>
+        //var socket = io("http://192.168.1.66:955");
         var data = [];
-        setInterval(() => {
-          data.push(Math.floor(Math.random() * 200));
-          if(data.length >= 50) {
-            data = data.splice(1);
-          }
-          console.log(data);
-          window.myLine.update();
-        }, 200);
+        var color = window.chartColors;
         var config = {
           type: 'line',
           data: {
@@ -82,6 +76,7 @@
           },
           options: {
             responsive: true,
+            maintainAspecRation: true,
             title: {
               display: true,
             },
@@ -115,40 +110,45 @@
         window.onload = function() {
           var ctx = document.getElementById('canvas').getContext('2d');
           window.myLine = new Chart(ctx, config);
+
           setInterval(() => {
+            if (typeof socket === 'undefined' || socket === null){
+              data.push(Math.floor(Math.random() * 200));
+            }
+
+            if (data.length >= 20) {
+              data.shift();
+              window.myLine.config.data.datasets.data = data;
+              window.myLine.update();
+              console.log(window.myLine.config.data.datasets.data);
+            }
+
+            console.log(data);
             window.myLine.update();
-          },500);
+          }, 500);
         };
-      </script>
-    </div>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<!-- <script src="http://192.168.1.66:955/socket.io/socket.io.js"></script>
-<script>
-    var socket = io("http://192.168.1.66:955");
 
-    socket.on('connected', function() {
-        console.log("Connected to PI");
-    });
+        socket.on('connected', function() {
+          console.log("Connected to PI");
+        });
 
-    socket.on('LDR', function(data) {
-      console.log(data);
-    });
+        socket.on('LDR', function(input) {
+          data.push(input);
+        });
 
-    function poll(gamePad) {
-        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-          if (!gamepads) {
-            return;
-          }
+        function poll(gamePad) {
+          var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+              if (!gamepads) {
+                return;
+              }
 
           var gamePad = gamepads[0];
 
-          // 0 = left horizontal
-          // 1 = left vertical
+              // 0 = left horizontal
+              // 1 = left vertical
 
-          // btn 6 = left trigger
-          // btn 7 = right trigger
+              // btn 6 = left trigger
+              // btn 7 = right trigger
 
           if (gamePad.buttons[7].value > .1) {
             console.log("Move forward!")
@@ -177,13 +177,15 @@
             socket.emit('rotate', { direction: 'vertical', value: 0 })
             document.getElementById("y-rotation").value =  0;
           }
+        }
 
-
-
-
-    }
-
-    setInterval(poll, 50)
-</script> -->
+        setInterval(poll, 50)
+      </script>
+  </div>
+  </div>
+  
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 </html>

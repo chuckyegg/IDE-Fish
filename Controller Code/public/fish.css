@@ -72,7 +72,7 @@ h2{
   background-color: white;
 }
 .lightSensorStream {
-  grid-column: 1/1;
+  grid-column: 2/3;
   text-align: left;
   font-size: 100%;
 }
