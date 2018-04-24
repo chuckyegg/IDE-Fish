@@ -52,14 +52,19 @@
     </div>
     <div class="lightSensorStream">
       <h3>Light sensor stream</h3>
-      <div>
+      <div align = "center">
         <canvas id="canvas" height = 100></canvas>
       </div>
       <br>
       <br>
-      <!-- <script src="http://192.168.1.66:955/socket.io/socket.io.js"></script> -->
+      <script src="http://192.168.1.66:955/socket.io/socket.io.js"></script>
       <script>
-        //var socket = io("http://192.168.1.66:955");
+        try{
+          var socket = io("http://192.168.1.66:955");
+        } catch(e) {
+          console.log(e);
+        }
+        
         var data = [];
         var color = window.chartColors;
         var config = {
@@ -75,6 +80,7 @@
             }]
           },
           options: {
+
             responsive: true,
             maintainAspecRation: true,
             title: {
@@ -113,7 +119,7 @@
 
           setInterval(() => {
             if (typeof socket === 'undefined' || socket === null){
-              data.push(Math.floor(Math.random() * 200));
+              data.push(Math.floor(Math.random() * -200));
             }
 
             if (data.length >= 20) {
